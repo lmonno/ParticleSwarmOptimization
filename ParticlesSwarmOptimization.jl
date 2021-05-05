@@ -1,4 +1,5 @@
 #push!(LOAD_PATH, pwd()*"\\src")
+#module ParticleSwarmOptimization
 using StatsBase, Distributed
 
 mutable struct PSO
@@ -21,18 +22,6 @@ mutable struct PSO
     obj_func
     PSO() = new()
 end
-
-options = Dict("size" => 50, 
-                "dim" => 1,
-                "max_iterations" => 100,
-                "frac_elite"=> 0.025,
-                "selection_data" => "stud",
-                "crossover_data"=> 0.1,
-                "mutation_rate"=> 0.05,
-                "mutation_data"=>0.1,
-                "lower_bound" => -5,
-                "upper_bound" => 5
-                )
 
 
 function set_options(aPSO::PSO, options::Dict)
@@ -102,9 +91,6 @@ function PSO_eval_fitness(aPSO::PSO)
     
 end
 
-# function select_parent(size, wgt, num_par)
-#     selected = sample(1:size, wgt, num_par; replace = true)
-#     return size .- selected .+ 1
 
 function PSO_choose_parents(aPSO::PSO)    
     
@@ -118,7 +104,7 @@ function PSO_choose_parents(aPSO::PSO)
         aPSO.parents[:,1] = aPSO.rankind[selected]
     end
     selected = sample(1:aPSO.options["size"] , Weights(fitness), aPSO.num_par; replace = true)
-    aPSO.parents[:,2] = aPSO.rankind[selected ] # il problema è che potrebbe esserci lo zero
+    aPSO.parents[:,2] = aPSO.rankind[selected ] 
 end
 
 function PSO_apply_crossover(aPSO::PSO)
@@ -150,35 +136,14 @@ function PSO_do_ranking(aPSO::PSO)
     aPSO.elite = sort(aPSO.rankind[1:aPSO.num_elite])
 end
 
-function  sumsquare(x)
-    return sum(x.^2)    
-end
+#end
 
-function  loss(β, x, y)
-    return sum( (β*x - y).^2)    
-end
 
-@run PSO_optimize(sumsquare, options)
 
-PSO_optimize(sumsquare, options)
+#@run PSO_optimize(sumsquare, options)
 
 
 # a =  rand(Float64, (3, 10 ))
 # fval = mapslices(sumsquare,a,  dims = 1)
 
 # @run sumsquare(a)
-
-# @distributed for i in 1:10
-#     i
-
-# end
-
-# # # julia alt enter
-a = [3, 6, 8, 0]
-a_i= 1:4
-b_i = 2:3
-
-#voglio b_i not in a_i [false, false, true, true]
-
-#in.(b_i,Ref(a_i))
-a_i .∈ (b_i,)
